@@ -9,4 +9,4 @@ people = {
 }
 df = pd.DataFrame(people)
 
-df.head()
+print(df)
