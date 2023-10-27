@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 pd.set_option('display.max_columns', 8)
 df: pd.DataFrame = pd.read_csv('file.csv', sep = ",")
@@ -41,7 +42,7 @@ print(len(df))
 # Outliers i inconsistències
 # 1. Creeu un nou dataframe escollint només columnes i files que us interessin i investigueu-les.
 
-df = df[['Id Afectat', 'Sexe', 'Municipi naixement', 'Província naixement', 'Província desaparició', 'Exèrcit', 'És afusellat', 'Localitzat']]
+df = df[['Sexe', 'Municipi naixement', 'Província naixement', 'Província desaparició', 'Exèrcit', 'És afusellat', 'Localitzat']]
 df['És afusellat'] = df['És afusellat'].astype(bool)
 df['Localitzat'] = df['Localitzat'].astype(bool)
 # print(df.info())
@@ -58,34 +59,54 @@ df['Localitzat'] = df['Localitzat'].astype(bool)
 
 df.to_csv('new_file.csv')
 
+# ¿Cuántos Republicanos vs Sublevados estuvieron desaparecidos?
 
-
-
-# print('Num de republicanos = ',df['Exèrcit'].avg())
+# Podremos observar en el gráfico que la mayoria eran o republicanos o sin identificar.
 
 republicanos = (df['Exèrcit'] == 'REPUBLICÀ').sum()
 sublevados = (df['Exèrcit'] == 'REBEL').sum()
 nulos = (pd.isnull(df['Exèrcit'])).sum()
 
-# print(f'Republicanos = {republicanos}')
-# print(f'Sublevados = {rebels}')
-# print(f'Nulos = {nulos}')
-
-# print(f'Total = {republicanos + sublevados + nulos}/{len(df)}')
-
-# Etiquetas y valores para el gráfico de barras
 etiquetas = ['Republicanos', 'Sublevados', 'Nulos']
 valores = [republicanos, sublevados, nulos]
 
-# Crear el gráfico de barras
 plt.bar(etiquetas, valores, color=['blue', 'red', 'gray'])
 plt.xlabel('Categoría')
 plt.ylabel('Cantidad')
 plt.title('Personas desaparecidas durante la guerra civil - Distribución del ejército')
 
-# Mostrar el gráfico
 # plt.show()
 plt.savefig('republicanos-sublevados.png')
 
+# ¿Cuál es el número de desaparecidos por cada provincia?
 
+# Como se puede observar en el gráfico, la provincia con mmás desaparecidos es Tarragona (seguido de Lleida y Barcelona)
+
+pd_count = df['Província desaparició'].value_counts()
+
+plt.figure(figsize=(12, 12))
+pd_count.plot(kind='bar', color='skyblue')
+plt.title('Distribución de desaparecidos por provincia de desaparición')
+plt.xlabel('Provincia de Desaparición')
+plt.ylabel('Número de Desaparecidos')
+
+plt.savefig('desaparecidos-provincia.png')
+
+# Muestra en un gráfico de dispersión como se relacionan los datos entre Provincia de nacimiento y provincia de desaparición.
+
+# En el gráfico se observan las provincias que tienen más relación entre nacimiento y desaparición.
+
+df = df[['Província naixement', 'Província desaparició']]
+
+plt.figure(figsize=(10, 8))
+sns.set(style="whitegrid")
+sns.set_palette("husl")
+sns.scatterplot(data=df, x='Província naixement', y='Província desaparició', alpha=0.6)
+
+plt.title('Relación entre provincia de nacimiento y provincia de desaparición')
+plt.xlabel('Provincia de Nacimiento')
+plt.ylabel('Provincia de Desaparición')
+plt.xticks(rotation=90)
+
+plt.savefig('relacion-naixement-desaparicio.png')
 
